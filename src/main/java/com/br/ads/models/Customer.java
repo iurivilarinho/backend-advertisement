@@ -6,13 +6,15 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-@Table(name = "tbClient")
+@Entity
+@Table(name = "tbCustomer")
 @Schema(description = "Entidade que representa um cliente anunciante.")
 public class Customer {
 
@@ -29,11 +31,11 @@ public class Customer {
 	@Schema(description = "Telefone do cliente.", example = "+55 31 99999-9999")
 	private String phone;
 
-	@OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Schema(description = "Lista de anúncios vinculados ao cliente.")
 	private List<Advertisement> advertisements = new ArrayList<>();
 
-	@OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Schema(description = "Lista de links de redes sociais do cliente.")
 	private List<SocialLink> socialLinks = new ArrayList<>();
 

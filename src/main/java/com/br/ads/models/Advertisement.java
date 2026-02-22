@@ -1,4 +1,3 @@
-// src/main/java/com/cantodeminas/ads/domain/model/Advertisement.java
 package com.br.ads.models;
 
 import java.time.DayOfWeek;

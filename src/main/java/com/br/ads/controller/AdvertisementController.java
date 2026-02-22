@@ -4,21 +4,21 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.br.ads.services.AdvertisementService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -26,7 +26,7 @@ import request.AdvertisementRequest;
 import response.AdvertisementResponse;
 
 @RestController
-@RequestMapping("/api/advertisements")
+@RequestMapping("/advertisements")
 public class AdvertisementController {
 
 	private final AdvertisementService service;
@@ -38,10 +38,10 @@ public class AdvertisementController {
 	@Operation(summary = "Cadastrar anúncio", description = "Cria um novo anúncio do tipo imagem/carrossel ou vídeo.")
 	@ApiResponses({ @ApiResponse(responseCode = "201", description = "Anúncio criado com sucesso."),
 			@ApiResponse(responseCode = "400", description = "Requisição inválida.") })
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<AdvertisementResponse> create(@Valid @RequestBody AdvertisementRequest request) {
-		return ResponseEntity.ok(new AdvertisementResponse(service.create(request)));
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<AdvertisementResponse> create(@Valid @ModelAttribute AdvertisementRequest request) {
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(new AdvertisementResponse(service.create(request)));
 	}
 
 	@Operation(summary = "Consultar anúncio", description = "Consulta um anúncio pelo identificador.")
@@ -56,9 +56,9 @@ public class AdvertisementController {
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = "Anúncio atualizado com sucesso."),
 			@ApiResponse(responseCode = "400", description = "Requisição inválida."),
 			@ApiResponse(responseCode = "404", description = "Anúncio não encontrado.") })
-	@PutMapping("/{id}")
+	@PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<AdvertisementResponse> update(@PathVariable Long id,
-			@Valid @RequestBody AdvertisementRequest request) {
+			@Valid @ModelAttribute AdvertisementRequest request) {
 		return ResponseEntity.ok(new AdvertisementResponse(service.update(id, request)));
 	}
 
@@ -66,7 +66,6 @@ public class AdvertisementController {
 	@ApiResponses({ @ApiResponse(responseCode = "204", description = "Anúncio excluído com sucesso."),
 			@ApiResponse(responseCode = "404", description = "Anúncio não encontrado.") })
 	@DeleteMapping("/{id}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable Long id) {
 		service.delete(id);
 	}

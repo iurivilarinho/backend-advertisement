@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.br.ads.enums.AdvertisementType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -65,6 +67,8 @@ public class AdvertisementRequest {
 	@Schema(description = "Duração do vídeo em segundos (opcional; se informado será validado/armazenado).", example = "30")
 	private Integer videoDurationSeconds;
 
+	private MultipartFile video;
+
 	public AdvertisementRequest() {
 	}
 
@@ -114,6 +118,62 @@ public class AdvertisementRequest {
 
 	public Integer getVideoDurationSeconds() {
 		return videoDurationSeconds;
+	}
+
+	public MultipartFile getVideo() {
+		return video;
+	}
+
+	public void setVideo(MultipartFile video) {
+		this.video = video;
+	}
+
+	public void setCustomerId(Long customerId) {
+		this.customerId = customerId;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setType(AdvertisementType type) {
+		this.type = type;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+
+	public void setValidFrom(LocalDate validFrom) {
+		this.validFrom = validFrom;
+	}
+
+	public void setValidTo(LocalDate validTo) {
+		this.validTo = validTo;
+	}
+
+	public void setMaxShowsPerDay(int maxShowsPerDay) {
+		this.maxShowsPerDay = maxShowsPerDay;
+	}
+
+	public void setAllowedDays(Set<DayOfWeek> allowedDays) {
+		this.allowedDays = allowedDays;
+	}
+
+	public void setShowSocialAtEnd(Boolean showSocialAtEnd) {
+		this.showSocialAtEnd = showSocialAtEnd;
+	}
+
+	public void setImages(List<AdvertisementImageRequest> images) {
+		this.images = images;
+	}
+
+	public void setVideoUrl(String videoUrl) {
+		this.videoUrl = videoUrl;
+	}
+
+	public void setVideoDurationSeconds(Integer videoDurationSeconds) {
+		this.videoDurationSeconds = videoDurationSeconds;
 	}
 
 }

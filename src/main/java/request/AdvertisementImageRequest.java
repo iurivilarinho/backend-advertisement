@@ -1,14 +1,15 @@
 package request;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Schema(description = "DTO de requisição para uma imagem do anúncio.")
 public class AdvertisementImageRequest {
 
-	@NotBlank
+	
 	@Size(max = 1000)
 	@Schema(description = "URL/arquivo da imagem.", example = "https://cdn.exemplo.com/img1.jpg", requiredMode = Schema.RequiredMode.REQUIRED)
 	private String imageUrl;
@@ -20,6 +21,8 @@ public class AdvertisementImageRequest {
 	@Min(0)
 	@Schema(description = "Ordem da imagem no carrossel.", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
 	private int orderIndex;
+
+	private MultipartFile image;
 
 	public AdvertisementImageRequest() {
 	}
@@ -47,4 +50,13 @@ public class AdvertisementImageRequest {
 	public void setOrderIndex(int orderIndex) {
 		this.orderIndex = orderIndex;
 	}
+
+	public MultipartFile getImage() {
+		return image;
+	}
+
+	public void setImage(MultipartFile image) {
+		this.image = image;
+	}
+
 }

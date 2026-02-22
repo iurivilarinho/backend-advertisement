@@ -1,4 +1,3 @@
-// src/main/java/com/cantodeminas/ads/domain/model/SocialLink.java
 package com.br.ads.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;

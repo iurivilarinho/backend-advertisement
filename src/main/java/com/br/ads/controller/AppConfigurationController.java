@@ -21,7 +21,7 @@ import request.AppConfigurationRequest;
 import response.AppConfigurationResponse;
 
 @RestController
-@RequestMapping("/api/configuration")
+@RequestMapping("/configuration")
 public class AppConfigurationController {
 
 	private final AppConfigurationService service;

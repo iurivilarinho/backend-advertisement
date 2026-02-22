@@ -1,4 +1,3 @@
-// src/main/java/com/cantodeminas/ads/api/controller/CustomerController.java
 package com.br.ads.controller;
 
 import org.springframework.http.HttpStatus;
@@ -26,7 +25,7 @@ import response.CustomerResponse;
 import response.SocialLinkResponse;
 
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping("/customers")
 public class CustomerController {
 
 	private final CustomerService service;

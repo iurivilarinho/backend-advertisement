@@ -1,4 +1,3 @@
-// src/main/java/com/cantodeminas/ads/domain/model/AdvertisementImage.java
 package com.br.ads.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
