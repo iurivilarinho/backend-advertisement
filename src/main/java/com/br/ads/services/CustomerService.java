@@ -3,6 +3,8 @@ package com.br.ads.services;
 
 import java.time.LocalDate;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,7 +13,9 @@ import com.br.ads.models.SocialLink;
 import com.br.ads.repo.AdvertisementRepository;
 import com.br.ads.repo.CustomerRepository;
 import com.br.ads.repo.SocialLinkRepository;
+import com.br.ads.specification.CustomerSpecification;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import request.CustomerRequest;
 import request.SocialLinkRequest;
@@ -23,12 +27,14 @@ public class CustomerService {
 	private final CustomerRepository customerRepository;
 	private final SocialLinkRepository socialLinkRepository;
 	private final AdvertisementRepository advertisementRepository;
+	private final EntityManager entityManager;
 
 	public CustomerService(CustomerRepository customerRepository, SocialLinkRepository socialLinkRepository,
-			AdvertisementRepository advertisementRepository) {
+			AdvertisementRepository advertisementRepository, EntityManager entityManager) {
 		this.customerRepository = customerRepository;
 		this.socialLinkRepository = socialLinkRepository;
 		this.advertisementRepository = advertisementRepository;
+		this.entityManager = entityManager;
 	}
 
 	@Transactional
@@ -38,28 +44,35 @@ public class CustomerService {
 	}
 
 	@Transactional(readOnly = true)
-	public Customer getById(Long id) {
+	public Customer findById(Long id) {
 		return customerRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Customere não encontrado: id=" + id));
 	}
 
+	@Transactional(readOnly = true)
+	public Page<Customer> findAll(String search, Pageable page) {
+		return customerRepository.findAll(CustomerSpecification.searchAllFields(search, entityManager), page);
+
+	}
+
 	@Transactional
 	public Customer update(Long id, CustomerRequest request) {
-		Customer customer = getById(id);
+		Customer customer = findById(id);
 		customer.setName(request.getName());
 		customer.setPhone(request.getPhone());
 		return customerRepository.save(customer);
 	}
 
 	@Transactional
-	public void delete(Long id) {
-		Customer customer = getById(id);
-		customerRepository.delete(customer);
+	public void enableDisable(Long id, Boolean status) {
+		Customer customer = findById(id);
+		customer.setActive(status);
+		customerRepository.save(customer);
 	}
 
 	@Transactional
 	public SocialLink addSocialLink(Long customerId, SocialLinkRequest request) {
-		Customer customer = getById(customerId);
+		Customer customer = findById(customerId);
 		SocialLink link = new SocialLink(customer, request.getUrl(), request.getLabel());
 		customer.getSocialLinks().add(link);
 		return socialLinkRepository.save(link);
@@ -67,7 +80,7 @@ public class CustomerService {
 
 	@Transactional
 	public void removeSocialLink(Long customerId, Long linkId) {
-		getById(customerId);
+		findById(customerId);
 		SocialLink link = socialLinkRepository.findById(linkId)
 				.orElseThrow(() -> new EntityNotFoundException("Link de rede social não encontrado: id=" + linkId));
 		if (!link.getCustomer().getId().equals(customerId)) {
@@ -78,7 +91,7 @@ public class CustomerService {
 
 	@Transactional(readOnly = true)
 	public CustomerIndicatorsResponse getIndicators(Long customerId) {
-		getById(customerId);
+		findById(customerId);
 
 		LocalDate today = LocalDate.now();
 		long activeCount = advertisementRepository.findByCustomerId(customerId).stream()

@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -31,6 +32,10 @@ public class Customer {
 	@Schema(description = "Telefone do cliente.", example = "+55 31 99999-9999")
 	private String phone;
 
+	@Column(nullable = false)
+	@Schema(description = "Indica se o cliente está vigente (ativo).", example = "true")
+	private Boolean active;
+
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Schema(description = "Lista de anúncios vinculados ao cliente.")
 	private List<Advertisement> advertisements = new ArrayList<>();
@@ -45,6 +50,11 @@ public class Customer {
 	public Customer(String name, String phone) {
 		this.name = name;
 		this.phone = phone;
+	}
+
+	@PrePersist
+	public void create() {
+		this.active = true;
 	}
 
 	public Long getId() {
@@ -74,4 +84,21 @@ public class Customer {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+
+	public void setAdvertisements(List<Advertisement> advertisements) {
+		this.advertisements = advertisements;
+	}
+
+	public void setSocialLinks(List<SocialLink> socialLinks) {
+		this.socialLinks = socialLinks;
+	}
+
 }

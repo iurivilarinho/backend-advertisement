@@ -1,14 +1,18 @@
 package com.br.ads.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,8 +51,17 @@ public class CustomerController {
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = "Customere encontrado."),
 			@ApiResponse(responseCode = "404", description = "Customere não encontrado.") })
 	@GetMapping("/{id}")
-	public ResponseEntity<CustomerResponse> getById(@PathVariable Long id) {
-		return ResponseEntity.ok(new CustomerResponse(service.getById(id)));
+	public ResponseEntity<CustomerResponse> findById(@PathVariable Long id) {
+		return ResponseEntity.ok(new CustomerResponse(service.findById(id)));
+	}
+
+	@Operation(summary = "Consultar customers", description = "Buscar todos os clientes.")
+	@ApiResponses({ @ApiResponse(responseCode = "200", description = "Customere encontrado."),
+			@ApiResponse(responseCode = "404", description = "Customere não encontrado.") })
+	@GetMapping
+	public ResponseEntity<Page<CustomerResponse>> findAll(@RequestParam(required = false) String search,
+			Pageable page) {
+		return ResponseEntity.ok(service.findAll(search, page).map(CustomerResponse::new));
 	}
 
 	@Operation(summary = "Atualizar customer", description = "Atualiza os dados de um customere existente.")
@@ -60,13 +73,13 @@ public class CustomerController {
 		return ResponseEntity.ok(new CustomerResponse(service.update(id, request)));
 	}
 
-	@Operation(summary = "Excluir customer", description = "Exclui um customere existente.")
-	@ApiResponses({ @ApiResponse(responseCode = "204", description = "Customere excluído com sucesso."),
+	@Operation(summary = "Atualiza active de customer", description = "Ativa/Desativa um customere existente.")
+	@ApiResponses({ @ApiResponse(responseCode = "204", description = "Customere atualizado com sucesso."),
 			@ApiResponse(responseCode = "404", description = "Customere não encontrado.") })
-	@DeleteMapping("/{id}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void delete(@PathVariable Long id) {
-		service.delete(id);
+	@PatchMapping("/{id}/enable-disable/{active}")
+	public ResponseEntity<?> enableDisable(@PathVariable Long id, @PathVariable Boolean active) {
+		service.enableDisable(id, active);
+		return ResponseEntity.ok().build();
 	}
 
 	@Operation(summary = "Adicionar rede social ao customere", description = "Cadastra um link de rede social para o customere.")
