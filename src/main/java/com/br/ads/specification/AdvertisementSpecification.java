@@ -11,17 +11,24 @@ import jakarta.persistence.criteria.Predicate;
 
 public class AdvertisementSpecification {
 
+	public static Specification<Advertisement> customerIdsEquals(Long customerId) {
+		if (customerId == null) {
+			return Specification.unrestricted();
+		}
+		return (root, query, builder) -> builder.equal(root.get("customer").get("id"), customerId);
+	}
+
 	public static Specification<Advertisement> isValid(LocalDate date) {
 		final LocalDate effectiveDate = (date != null) ? date : LocalDate.now();
 
 		return (root, query, builder) -> {
 			Predicate isActive = builder.isTrue(root.get("active"));
 
-			Predicate fromOk = builder.or(builder.isNull(root.get("validFrom")),
-					builder.lessThanOrEqualTo(root.get("validFrom"), effectiveDate));
+			Predicate fromOk = builder.or(builder.isNull(root.get("recurrence").get("startDate")),
+					builder.lessThanOrEqualTo(root.get("recurrence").get("startDate"), effectiveDate));
 
-			Predicate toOk = builder.or(builder.isNull(root.get("validTo")),
-					builder.greaterThanOrEqualTo(root.get("validTo"), effectiveDate));
+			Predicate toOk = builder.or(builder.isNull(root.get("recurrence").get("endDate")),
+					builder.greaterThanOrEqualTo(root.get("recurrence").get("endDate"), effectiveDate));
 
 			return builder.and(isActive, fromOk, toOk);
 		};
@@ -36,7 +43,7 @@ public class AdvertisementSpecification {
 			if (day == null) {
 				return builder.conjunction();
 			}
-			return builder.isMember(day, root.get("allowedDays"));
+			return builder.isMember(day, root.get("recurrence").get("allowedDays"));
 		};
 	}
 

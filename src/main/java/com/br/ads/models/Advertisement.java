@@ -1,19 +1,13 @@
 package com.br.ads.models;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 import com.br.ads.enums.AdvertisementType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import request.AdvertisementRequest;
@@ -57,30 +52,15 @@ public class Advertisement {
 	@Schema(description = "Indica se o anúncio está vigente (ativo).", example = "true")
 	private Boolean active;
 
-	@Column(nullable = false)
-	@Schema(description = "Data de início da vigência.", example = "2026-02-20")
-	private LocalDate validFrom;
-
-	@Column(nullable = false)
-	@Schema(description = "Data de fim da vigência.", example = "2026-03-20")
-	private LocalDate validTo;
-
-	@Column(nullable = false)
-	@Schema(description = "Quantidade máxima de exibições por dia.", example = "10")
-	private int maxShowsPerDay;
-
-	@ElementCollection(fetch = FetchType.EAGER)
-	@CollectionTable(name = "tbAdvertisementAllowedDay", joinColumns = @JoinColumn(name = "fk_Id_Advertisement", foreignKey = @ForeignKey(name = "FK_FROM_tbAdvertisement_FOR_tbAdvertisementAllowedDay")))
-	@Column(name = "allowedDay", nullable = false, length = 20)
-	@Enumerated(EnumType.STRING)
-	@Schema(description = "Dias da semana em que o anúncio pode ser exibido.")
-	private Set<DayOfWeek> allowedDays = EnumSet.noneOf(DayOfWeek.class);
+	@Schema(description = "Recorrência vinculada ao anuncio.", example = "true")
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "fk_Id_Recurrence")
+	private Recurrence recurrence;
 
 	@Column(nullable = false)
 	@Schema(description = "Se verdadeiro, exibe redes sociais ao final do anúncio antes de seguir para o próximo.", example = "true")
 	private Boolean showSocialAtEnd;
 
-	// IMAGE fields: always a list (even for single image)
 	@OneToMany(mappedBy = "advertisement", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("orderIndex ASC")
 	@Schema(description = "Lista de imagens do anúncio (sempre lista, mesmo que tenha apenas uma imagem).")
@@ -102,11 +82,7 @@ public class Advertisement {
 		this.name = payload.getName();
 		this.type = payload.getType();
 		this.active = payload.getActive();
-		this.validFrom = payload.getValidFrom();
-		this.validTo = payload.getValidTo();
-		this.maxShowsPerDay = payload.getMaxShowsPerDay();
-		this.allowedDays = (payload.getAllowedDays() == null) ? EnumSet.noneOf(DayOfWeek.class)
-				: EnumSet.copyOf(payload.getAllowedDays());
+		this.recurrence = payload.getRecurrence() != null ? new Recurrence(payload.getRecurrence()) : null;
 		this.showSocialAtEnd = payload.getShowSocialAtEnd();
 	}
 
@@ -130,36 +106,56 @@ public class Advertisement {
 		return active;
 	}
 
-	public LocalDate getValidFrom() {
-		return validFrom;
+	public Boolean getActive() {
+		return active;
 	}
 
-	public LocalDate getValidTo() {
-		return validTo;
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
-	public int getMaxShowsPerDay() {
-		return maxShowsPerDay;
+	public Recurrence getRecurrence() {
+		return recurrence;
 	}
 
-	public Set<DayOfWeek> getAllowedDays() {
-		return allowedDays;
+	public void setRecurrence(Recurrence recurrence) {
+		this.recurrence = recurrence;
 	}
 
-	public Boolean isShowSocialAtEnd() {
+	public Boolean getShowSocialAtEnd() {
 		return showSocialAtEnd;
+	}
+
+	public void setShowSocialAtEnd(Boolean showSocialAtEnd) {
+		this.showSocialAtEnd = showSocialAtEnd;
 	}
 
 	public List<AdvertisementImage> getImages() {
 		return images;
 	}
 
+	public void setImages(List<AdvertisementImage> images) {
+		this.images = images;
+	}
+
 	public String getVideoUrl() {
 		return videoUrl;
 	}
 
+	public void setVideoUrl(String videoUrl) {
+		this.videoUrl = videoUrl;
+	}
+
 	public Integer getVideoDurationSeconds() {
 		return videoDurationSeconds;
+	}
+
+	public void setVideoDurationSeconds(Integer videoDurationSeconds) {
+		this.videoDurationSeconds = videoDurationSeconds;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
 	}
 
 	public void setName(String name) {
@@ -170,60 +166,4 @@ public class Advertisement {
 		this.type = type;
 	}
 
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
-
-	public void setValidFrom(LocalDate validFrom) {
-		this.validFrom = validFrom;
-	}
-
-	public void setValidTo(LocalDate validTo) {
-		this.validTo = validTo;
-	}
-
-	public void setMaxShowsPerDay(int maxShowsPerDay) {
-		this.maxShowsPerDay = maxShowsPerDay;
-	}
-
-	public void setAllowedDays(Set<DayOfWeek> allowedDays) {
-		this.allowedDays = (allowedDays == null) ? EnumSet.noneOf(DayOfWeek.class) : EnumSet.copyOf(allowedDays);
-	}
-
-	public void setShowSocialAtEnd(Boolean showSocialAtEnd) {
-		this.showSocialAtEnd = showSocialAtEnd;
-	}
-
-	public void setVideoUrl(String videoUrl) {
-		this.videoUrl = videoUrl;
-	}
-
-	public void setVideoDurationSeconds(Integer videoDurationSeconds) {
-		this.videoDurationSeconds = videoDurationSeconds;
-	}
-
-	public Boolean getActive() {
-		return active;
-	}
-
-	public Boolean getShowSocialAtEnd() {
-		return showSocialAtEnd;
-	}
-
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
-	}
-
-	public void setImages(List<AdvertisementImage> images) {
-		this.images = images;
-	}
-
-	public Boolean isCurrentlyValid(LocalDate today) {
-		if (!active)
-			return false;
-		if (today == null)
-			today = LocalDate.now();
-		return (today.isEqual(validFrom) || today.isAfter(validFrom))
-				&& (today.isEqual(validTo) || today.isBefore(validTo));
-	}
 }

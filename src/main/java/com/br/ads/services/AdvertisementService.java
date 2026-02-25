@@ -17,6 +17,7 @@ import com.br.ads.enums.AdvertisementType;
 import com.br.ads.models.Advertisement;
 import com.br.ads.models.AdvertisementImage;
 import com.br.ads.models.Customer;
+import com.br.ads.models.Recurrence;
 import com.br.ads.repo.AdvertisementRepository;
 import com.br.ads.repo.CustomerRepository;
 import com.br.ads.specification.AdvertisementSpecification;
@@ -73,16 +74,19 @@ public class AdvertisementService {
 
 		}
 
+		if (request.getRecurrence() != null) {
+			Recurrence recurrence = ad.getRecurrence();
+			recurrence.setAllowedDays(request.getRecurrence().getAllowedDays());
+			recurrence.setDailyDisplayCount(request.getRecurrence().getDailyDisplayCount());
+			recurrence.setEndDate(request.getRecurrence().getEndDate());
+			recurrence.setStartDate(request.getRecurrence().getStartDate());
+		}
+
 		ad.setName(request.getName());
 		ad.setType(request.getType());
 		ad.setActive(request.getActive());
-		ad.setValidFrom(request.getValidFrom());
-		ad.setValidTo(request.getValidTo());
-		ad.setMaxShowsPerDay(request.getMaxShowsPerDay());
-		ad.setAllowedDays(request.getAllowedDays());
 		ad.setShowSocialAtEnd(request.getShowSocialAtEnd());
 
-		// limpa mídia anterior e aplica nova
 		ad.getImages().clear();
 		ad.setVideoUrl(null);
 		ad.setVideoDurationSeconds(null);

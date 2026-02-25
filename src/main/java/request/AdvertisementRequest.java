@@ -1,10 +1,7 @@
 // src/main/java/com/cantodeminas/ads/api/dto/request/AdvertisementRequest.java
 package request;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,9 +9,7 @@ import com.br.ads.enums.AdvertisementType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -34,24 +29,12 @@ public class AdvertisementRequest {
 	@Schema(description = "Tipo do anúncio.", example = "IMAGE", requiredMode = Schema.RequiredMode.REQUIRED)
 	private AdvertisementType type;
 
-	@Schema(description = "Indica se o anúncio está vigente (ativo).", example = "true")
-	private Boolean active = true;
+	@Schema(description = "Indica se o anúncio está vigente (ativo).", example = "true") 
+	private Boolean active;
 
-	@NotNull(message = "A data de início da vigência é obrigatória.")
-	@Schema(description = "Data de início da vigência.", example = "2026-02-20", requiredMode = Schema.RequiredMode.REQUIRED)
-	private LocalDate validFrom;
-
-	@NotNull(message = "A data de fim da vigência é obrigatória.")
-	@Schema(description = "Data de fim da vigência.", example = "2026-03-20", requiredMode = Schema.RequiredMode.REQUIRED)
-	private LocalDate validTo;
-
-	@Min(value = 0, message = "A quantidade máxima de exibições por dia deve ser maior ou igual a 0.")
-	@Schema(description = "Quantidade máxima de exibições por dia.", example = "10", requiredMode = Schema.RequiredMode.REQUIRED)
-	private int maxShowsPerDay;
-
-	@NotEmpty(message = "A lista de dias da semana permitidos é obrigatória.")
-	@Schema(description = "Dias da semana permitidos para exibição.", requiredMode = Schema.RequiredMode.REQUIRED)
-	private Set<DayOfWeek> allowedDays;
+	@Valid
+	@Schema(description = "Reccorencia de execução do anuncio.")
+	private RecurrenceRequest recurrence;
 
 	@Schema(description = "Se verdadeiro, exibe redes sociais ao final do anúncio.", example = "true")
 	private Boolean showSocialAtEnd;
@@ -88,36 +71,44 @@ public class AdvertisementRequest {
 		return active;
 	}
 
-	public LocalDate getValidFrom() {
-		return validFrom;
+	public RecurrenceRequest getRecurrence() {
+		return recurrence;
 	}
 
-	public LocalDate getValidTo() {
-		return validTo;
-	}
-
-	public int getMaxShowsPerDay() {
-		return maxShowsPerDay;
-	}
-
-	public Set<DayOfWeek> getAllowedDays() {
-		return allowedDays;
+	public void setRecurrence(RecurrenceRequest recurrence) {
+		this.recurrence = recurrence;
 	}
 
 	public Boolean getShowSocialAtEnd() {
 		return showSocialAtEnd;
 	}
 
+	public void setShowSocialAtEnd(Boolean showSocialAtEnd) {
+		this.showSocialAtEnd = showSocialAtEnd;
+	}
+
 	public List<AdvertisementImageRequest> getImages() {
 		return images;
+	}
+
+	public void setImages(List<AdvertisementImageRequest> images) {
+		this.images = images;
 	}
 
 	public String getVideoUrl() {
 		return videoUrl;
 	}
 
+	public void setVideoUrl(String videoUrl) {
+		this.videoUrl = videoUrl;
+	}
+
 	public Integer getVideoDurationSeconds() {
 		return videoDurationSeconds;
+	}
+
+	public void setVideoDurationSeconds(Integer videoDurationSeconds) {
+		this.videoDurationSeconds = videoDurationSeconds;
 	}
 
 	public MultipartFile getVideo() {
@@ -142,38 +133,6 @@ public class AdvertisementRequest {
 
 	public void setActive(Boolean active) {
 		this.active = active;
-	}
-
-	public void setValidFrom(LocalDate validFrom) {
-		this.validFrom = validFrom;
-	}
-
-	public void setValidTo(LocalDate validTo) {
-		this.validTo = validTo;
-	}
-
-	public void setMaxShowsPerDay(int maxShowsPerDay) {
-		this.maxShowsPerDay = maxShowsPerDay;
-	}
-
-	public void setAllowedDays(Set<DayOfWeek> allowedDays) {
-		this.allowedDays = allowedDays;
-	}
-
-	public void setShowSocialAtEnd(Boolean showSocialAtEnd) {
-		this.showSocialAtEnd = showSocialAtEnd;
-	}
-
-	public void setImages(List<AdvertisementImageRequest> images) {
-		this.images = images;
-	}
-
-	public void setVideoUrl(String videoUrl) {
-		this.videoUrl = videoUrl;
-	}
-
-	public void setVideoDurationSeconds(Integer videoDurationSeconds) {
-		this.videoDurationSeconds = videoDurationSeconds;
 	}
 
 }

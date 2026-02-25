@@ -1,10 +1,7 @@
 // src/main/java/com/cantodeminas/ads/api/dto/response/AdvertisementResponse.java
 package response;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 import com.br.ads.enums.AdvertisementType;
 import com.br.ads.models.Advertisement;
@@ -29,17 +26,8 @@ public class AdvertisementResponse {
 	@Schema(description = "Indica se o anúncio está vigente (ativo).", example = "true")
 	private boolean active;
 
-	@Schema(description = "Data de início da vigência.", example = "2026-02-20")
-	private LocalDate validFrom;
-
-	@Schema(description = "Data de fim da vigência.", example = "2026-03-20")
-	private LocalDate validTo;
-
-	@Schema(description = "Quantidade máxima de exibições por dia.", example = "10")
-	private int maxShowsPerDay;
-
-	@Schema(description = "Dias da semana permitidos para exibição.")
-	private Set<DayOfWeek> allowedDays;
+	@Schema(description = "Recorrência vinculada ao anuncio.", example = "true")
+	private RecurrenceResponse recurrence;
 
 	@Schema(description = "Se verdadeiro, exibe redes sociais ao final do anúncio.", example = "true")
 	private boolean showSocialAtEnd;
@@ -62,10 +50,8 @@ public class AdvertisementResponse {
 		this.name = advertisement.getName();
 		this.type = advertisement.getType();
 		this.active = advertisement.getActive();
-		this.validFrom = advertisement.getValidFrom();
-		this.validTo = advertisement.getValidTo();
-		this.maxShowsPerDay = advertisement.getMaxShowsPerDay();
-		this.allowedDays = advertisement.getAllowedDays();
+		this.recurrence = advertisement.getRecurrence() != null ? new RecurrenceResponse(advertisement.getRecurrence())
+				: null;
 		this.showSocialAtEnd = advertisement.getShowSocialAtEnd();
 		this.images = advertisement.getImages() != null
 				? advertisement.getImages().stream().map(AdvertisementImageResponse::new).toList()
@@ -78,7 +64,7 @@ public class AdvertisementResponse {
 		return id;
 	}
 
-	public Long getClientId() {
+	public Long getCustomerId() {
 		return customerId;
 	}
 
@@ -94,20 +80,8 @@ public class AdvertisementResponse {
 		return active;
 	}
 
-	public LocalDate getValidFrom() {
-		return validFrom;
-	}
-
-	public LocalDate getValidTo() {
-		return validTo;
-	}
-
-	public int getMaxShowsPerDay() {
-		return maxShowsPerDay;
-	}
-
-	public Set<DayOfWeek> getAllowedDays() {
-		return allowedDays;
+	public RecurrenceResponse getRecurrence() {
+		return recurrence;
 	}
 
 	public boolean isShowSocialAtEnd() {
@@ -126,55 +100,4 @@ public class AdvertisementResponse {
 		return videoDurationSeconds;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public void setClientId(Long clientId) {
-		this.customerId = clientId;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setType(AdvertisementType type) {
-		this.type = type;
-	}
-
-	public void setActive(boolean active) {
-		this.active = active;
-	}
-
-	public void setValidFrom(LocalDate validFrom) {
-		this.validFrom = validFrom;
-	}
-
-	public void setValidTo(LocalDate validTo) {
-		this.validTo = validTo;
-	}
-
-	public void setMaxShowsPerDay(int maxShowsPerDay) {
-		this.maxShowsPerDay = maxShowsPerDay;
-	}
-
-	public void setAllowedDays(Set<DayOfWeek> allowedDays) {
-		this.allowedDays = allowedDays;
-	}
-
-	public void setShowSocialAtEnd(boolean showSocialAtEnd) {
-		this.showSocialAtEnd = showSocialAtEnd;
-	}
-
-	public void setImages(List<AdvertisementImageResponse> images) {
-		this.images = images;
-	}
-
-	public void setVideoUrl(String videoUrl) {
-		this.videoUrl = videoUrl;
-	}
-
-	public void setVideoDurationSeconds(Integer videoDurationSeconds) {
-		this.videoDurationSeconds = videoDurationSeconds;
-	}
 }

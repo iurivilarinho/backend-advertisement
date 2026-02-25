@@ -13,6 +13,7 @@ import com.br.ads.models.SocialLink;
 import com.br.ads.repo.AdvertisementRepository;
 import com.br.ads.repo.CustomerRepository;
 import com.br.ads.repo.SocialLinkRepository;
+import com.br.ads.specification.AdvertisementSpecification;
 import com.br.ads.specification.CustomerSpecification;
 
 import jakarta.persistence.EntityManager;
@@ -94,13 +95,15 @@ public class CustomerService {
 		findById(customerId);
 
 		LocalDate today = LocalDate.now();
-		long activeCount = advertisementRepository.findByCustomerId(customerId).stream()
-				.filter(ad -> ad.isCurrentlyValid(today)).count();
+		long activeCount = advertisementRepository.findAll(AdvertisementSpecification.customerIdsEquals(customerId)
+				.and(AdvertisementSpecification.allowedOnDay(today.getDayOfWeek()))
+				.and(AdvertisementSpecification.isValid(today))).stream().count();
 
 		// Regra prática para "tempo total": soma de duração do vídeo ou soma do
 		// carrossel (somatório das imagens).
-		long totalSeconds = advertisementRepository.findByCustomerId(customerId).stream()
-				.filter(ad -> ad.isCurrentlyValid(today)).mapToLong(ad -> {
+		long totalSeconds = advertisementRepository.findAll(AdvertisementSpecification.customerIdsEquals(customerId)
+				.and(AdvertisementSpecification.allowedOnDay(today.getDayOfWeek()))
+				.and(AdvertisementSpecification.isValid(today))).stream().mapToLong(ad -> {
 					if (ad.getType().name().equals("VIDEO")) {
 						return ad.getVideoDurationSeconds() == null ? 0 : ad.getVideoDurationSeconds();
 					}

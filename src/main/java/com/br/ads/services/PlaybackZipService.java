@@ -129,7 +129,10 @@ public class PlaybackZipService {
 		List<PlaybackManifest.Item> items = new ArrayList<>();
 
 		for (Advertisement ad : ads) {
-			Integer maxShows = (ad.getMaxShowsPerDay() > 0) ? ad.getMaxShowsPerDay() : null;
+			Integer dailyDisplayCount = ad.getRecurrence().getDailyDisplayCount() != null
+					? ad.getRecurrence().getDailyDisplayCount()
+					: 0;
+			Integer maxShows = (dailyDisplayCount > 0) ? ad.getRecurrence().getDailyDisplayCount() : null;
 			List<PlaybackManifest.Asset> assets = new ArrayList<>();
 
 			if (ad.getType() == AdvertisementType.VIDEO) {
