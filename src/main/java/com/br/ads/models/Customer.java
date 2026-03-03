@@ -1,7 +1,9 @@
 package com.br.ads.models;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.CascadeType;
@@ -38,7 +40,11 @@ public class Customer {
 
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Schema(description = "Lista de anúncios vinculados ao cliente.")
-	private List<Advertisement> advertisements = new ArrayList<>();
+	private Set<Advertisement> advertisements = new HashSet<>();
+
+	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Schema(description = "Lista de telas vinculados ao cliente.")
+	private Set<Display> displays = new HashSet<>();
 
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Schema(description = "Lista de links de redes sociais do cliente.")
@@ -69,10 +75,6 @@ public class Customer {
 		return phone;
 	}
 
-	public List<Advertisement> getAdvertisements() {
-		return advertisements;
-	}
-
 	public List<SocialLink> getSocialLinks() {
 		return socialLinks;
 	}
@@ -93,12 +95,24 @@ public class Customer {
 		this.active = active;
 	}
 
-	public void setAdvertisements(List<Advertisement> advertisements) {
+	public void setSocialLinks(List<SocialLink> socialLinks) {
+		this.socialLinks = socialLinks;
+	}
+
+	public Set<Advertisement> getAdvertisements() {
+		return advertisements;
+	}
+
+	public void setAdvertisements(Set<Advertisement> advertisements) {
 		this.advertisements = advertisements;
 	}
 
-	public void setSocialLinks(List<SocialLink> socialLinks) {
-		this.socialLinks = socialLinks;
+	public Set<Display> getDisplays() {
+		return displays;
+	}
+
+	public void setDisplays(Set<Display> displays) {
+		this.displays = displays;
 	}
 
 }

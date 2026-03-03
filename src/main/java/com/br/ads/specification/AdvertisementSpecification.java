@@ -11,14 +11,17 @@ import jakarta.persistence.criteria.Predicate;
 
 public class AdvertisementSpecification {
 
-	public static Specification<Advertisement> customerIdsEquals(Long customerId) {
+	public static Specification<Advertisement> customerIdEquals(Long customerId) {
 		if (customerId == null) {
 			return Specification.unrestricted();
 		}
 		return (root, query, builder) -> builder.equal(root.get("customer").get("id"), customerId);
 	}
 
-	public static Specification<Advertisement> isValid(LocalDate date) {
+	public static Specification<Advertisement> isValid(LocalDate date, Boolean active) {
+		if (active == null || Boolean.FALSE.equals(active)) {
+			return Specification.unrestricted();
+		}
 		final LocalDate effectiveDate = (date != null) ? date : LocalDate.now();
 
 		return (root, query, builder) -> {

@@ -2,6 +2,7 @@
 package request;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +30,7 @@ public class AdvertisementRequest {
 	@Schema(description = "Tipo do anúncio.", example = "IMAGE", requiredMode = Schema.RequiredMode.REQUIRED)
 	private AdvertisementType type;
 
-	@Schema(description = "Indica se o anúncio está vigente (ativo).", example = "true") 
+	@Schema(description = "Indica se o anúncio está vigente (ativo).", example = "true")
 	private Boolean active;
 
 	@Valid
@@ -42,6 +43,9 @@ public class AdvertisementRequest {
 	@Valid
 	@Schema(description = "Lista de imagens do anúncio (sempre lista, mesmo para imagem única). Obrigatório quando tipo=IMAGE.")
 	private List<AdvertisementImageRequest> images;
+
+	@Schema(description = "Lista de telas onde o anúncio será exibido")
+	private Set<Long> displayIds;
 
 	@Size(max = 1000, message = "A URL do vídeo deve ter no máximo 1000 caracteres.")
 	@Schema(description = "URL do vídeo. Obrigatório quando tipo=VIDEO.", example = "https://cdn.exemplo.com/video.mp4")
@@ -133,6 +137,14 @@ public class AdvertisementRequest {
 
 	public void setActive(Boolean active) {
 		this.active = active;
+	}
+
+	public Set<Long> getDisplayIds() {
+		return displayIds;
+	}
+
+	public void setDisplayIds(Set<Long> displayIds) {
+		this.displayIds = displayIds;
 	}
 
 }

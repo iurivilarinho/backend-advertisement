@@ -3,6 +3,8 @@ package com.br.ads.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.br.ads.controller.filters.AdvertisementFilters;
 import com.br.ads.services.AdvertisementService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import request.AdvertisementRequest;
+import response.AdvertisementBasicResponse;
 import response.AdvertisementResponse;
 
 @RestController
@@ -70,11 +74,11 @@ public class AdvertisementController {
 		service.delete(id);
 	}
 
-	@Operation(summary = "Listar anúncios por cliente", description = "Retorna todos os anúncios associados a um cliente.")
+	@Operation(summary = "Listar anúncios com paginação", description = "Retorna todos os anúncios.")
 	@ApiResponses({ @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso.") })
-	@GetMapping("/by-client/{clientId}")
-	public ResponseEntity<List<AdvertisementResponse>> listByClient(@PathVariable Long clientId) {
-		return ResponseEntity.ok(service.listByCustomer(clientId).stream().map(AdvertisementResponse::new).toList());
+	@GetMapping
+	public ResponseEntity<Page<AdvertisementBasicResponse>> findAll(AdvertisementFilters filters, Pageable page) {
+		return ResponseEntity.ok(service.findAll(filters, page).map(AdvertisementBasicResponse::new));
 	}
 
 	@Operation(summary = "Playlist ativa para execução", description = "Retorna a lista de anúncios aptos para reprodução na data informada (ou hoje).")

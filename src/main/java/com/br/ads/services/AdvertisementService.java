@@ -9,10 +9,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.br.ads.controller.filters.AdvertisementFilters;
 import com.br.ads.enums.AdvertisementType;
 import com.br.ads.models.Advertisement;
 import com.br.ads.models.AdvertisementImage;
@@ -31,13 +35,15 @@ public class AdvertisementService {
 
 	private final AdvertisementRepository advertisementRepository;
 	private final CustomerRepository customerRepository;
+	private final DisplayService displayService;
 	@Value("${ads.media.base-path}")
 	private String mediaBasePath;
 
-	public AdvertisementService(AdvertisementRepository advertisementRepository,
-			CustomerRepository customerRepository) {
+	public AdvertisementService(AdvertisementRepository advertisementRepository, CustomerRepository customerRepository,
+			DisplayService displayService) {
 		this.advertisementRepository = advertisementRepository;
 		this.customerRepository = customerRepository;
+		this.displayService = displayService;
 	}
 
 	@Transactional
@@ -47,6 +53,13 @@ public class AdvertisementService {
 
 		Advertisement ad = new Advertisement(customer, request);
 
+		if (request.getDisplayIds() == null) {
+			throw new DataIntegrityViolationException("Ao menos uma tela deve ser adicionada ao anuncio!");
+		}
+
+		for (Long displayId : request.getDisplayIds()) {
+			ad.getDisplays().add(displayService.findById(displayId));
+		}
 		// 1) salva para gerar ID
 		ad = advertisementRepository.save(ad);
 
@@ -91,6 +104,16 @@ public class AdvertisementService {
 		ad.setVideoUrl(null);
 		ad.setVideoDurationSeconds(null);
 
+		if (request.getDisplayIds() != null) {
+			ad.getDisplays().clear();
+
+			if (!request.getDisplayIds().isEmpty()) {
+				for (Long displayId : request.getDisplayIds()) {
+					ad.getDisplays().add(displayService.findById(displayId));
+				}
+			}
+		}
+
 		applyMedia(ad, request);
 
 		return advertisementRepository.save(ad);
@@ -103,14 +126,16 @@ public class AdvertisementService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Advertisement> listByCustomer(Long customerId) {
-		return advertisementRepository.findByCustomerId(customerId);
+	public Page<Advertisement> findAll(AdvertisementFilters filters, Pageable page) {
+		return advertisementRepository.findAll(AdvertisementSpecification.customerIdEquals(filters.getCustomerId())
+				.and(AdvertisementSpecification.allowedOnDay(filters.getDay()))
+				.and(AdvertisementSpecification.isValid(null, filters.getActive())), page);
 	}
 
 	@Transactional(readOnly = true)
 	public List<Advertisement> listActiveForPlayback(LocalDate date) {
 		return advertisementRepository.findAll(AdvertisementSpecification.allowedOnDay(date.getDayOfWeek())
-				.and(AdvertisementSpecification.isValid(date)));
+				.and(AdvertisementSpecification.isValid(date, true)));
 	}
 
 	private void applyMedia(Advertisement ad, AdvertisementRequest request) {

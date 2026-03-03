@@ -95,15 +95,15 @@ public class CustomerService {
 		findById(customerId);
 
 		LocalDate today = LocalDate.now();
-		long activeCount = advertisementRepository.findAll(AdvertisementSpecification.customerIdsEquals(customerId)
+		long activeCount = advertisementRepository.findAll(AdvertisementSpecification.customerIdEquals(customerId)
 				.and(AdvertisementSpecification.allowedOnDay(today.getDayOfWeek()))
-				.and(AdvertisementSpecification.isValid(today))).stream().count();
+				.and(AdvertisementSpecification.isValid(today, true))).stream().count();
 
 		// Regra prática para "tempo total": soma de duração do vídeo ou soma do
 		// carrossel (somatório das imagens).
-		long totalSeconds = advertisementRepository.findAll(AdvertisementSpecification.customerIdsEquals(customerId)
+		long totalSeconds = advertisementRepository.findAll(AdvertisementSpecification.customerIdEquals(customerId)
 				.and(AdvertisementSpecification.allowedOnDay(today.getDayOfWeek()))
-				.and(AdvertisementSpecification.isValid(today))).stream().mapToLong(ad -> {
+				.and(AdvertisementSpecification.isValid(today, true))).stream().mapToLong(ad -> {
 					if (ad.getType().name().equals("VIDEO")) {
 						return ad.getVideoDurationSeconds() == null ? 0 : ad.getVideoDurationSeconds();
 					}

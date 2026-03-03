@@ -1,7 +1,9 @@
 package com.br.ads.models;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.br.ads.enums.AdvertisementType;
 
@@ -17,6 +19,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -65,6 +69,11 @@ public class Advertisement {
 	@OrderBy("orderIndex ASC")
 	@Schema(description = "Lista de imagens do anúncio (sempre lista, mesmo que tenha apenas uma imagem).")
 	private List<AdvertisementImage> images = new ArrayList<>();
+
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name = "tbAdvertisement_x_tbDisplay", joinColumns = @JoinColumn(name = "fk_Id_Advertisement", foreignKey = @ForeignKey(name = "FK_FROM_TBADVERTISEMENT_FOR_TBADVERTISEMENT_X_TBDISPLAY")), inverseJoinColumns = @JoinColumn(name = "fk_Id_Display", foreignKey = @ForeignKey(name = "FK_FROM_TBDISPLAY_FOR_TBADVERTISEMENT_X_TBDISPLAY")))
+	@Schema(description = "Lista de displays vinculados ao anúncio.")
+	private Set<Display> displays = new HashSet<>();
 
 	@Column(nullable = true, length = 1000)
 	@Schema(description = "URL do vídeo (quando tipo=VIDEO).", example = "https://cdn.exemplo.com/video.mp4")
@@ -164,6 +173,14 @@ public class Advertisement {
 
 	public void setType(AdvertisementType type) {
 		this.type = type;
+	}
+
+	public Set<Display> getDisplays() {
+		return displays;
+	}
+
+	public void setDisplays(Set<Display> displays) {
+		this.displays = displays;
 	}
 
 }
